@@ -201,13 +201,6 @@ VITE_APP_NAME=Watcher
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
-
-For support and questions:
-- 📧 Email: support@watcher-system.com
-- 📖 Documentation: [docs.watcher-system.com](https://docs.watcher-system.com)
-- 🐛 Issues: [GitHub Issues](https://github.com/your-org/watcher-incident-system/issues)
-
 ## 🙏 Acknowledgments
 
 - Icons by [Lucide](https://lucide.dev/)

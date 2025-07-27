@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Search, 
-  Filter, 
   Plus, 
   AlertTriangle, 
   CheckCircle, 
@@ -12,7 +11,6 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useIncidents } from '../hooks/useIncidents';
-import { Incident } from '../types';
 import { formatDistanceToNow } from 'date-fns';
 
 const priorityColors = {

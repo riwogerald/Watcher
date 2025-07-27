@@ -15,8 +15,8 @@ export function LoginForm() {
     setError('');
     
     try {
-      await login(email, password);
-    } catch (err) {
+      await login(email);
+    } catch {
       setError('Invalid credentials. Please try again.');
     }
   };

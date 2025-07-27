@@ -9,8 +9,7 @@ import {
   Users,
   Settings,
   Shield,
-  FileText,
-  Bell
+  FileText
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 

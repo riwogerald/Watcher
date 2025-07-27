@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  AlertTriangle, 
-  Upload, 
   X, 
   MapPin, 
-  Calendar,
-  FileText,
   Send
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -60,7 +56,7 @@ export function ReportIncident() {
   const { user } = useAuth();
   const { addNotification } = useNotifications();
 
-  const handleInputChange = (field: keyof FormData, value: any) => {
+  const handleInputChange = (field: keyof FormData, value: string | string[] | File[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -75,14 +71,6 @@ export function ReportIncident() {
     handleInputChange('tags', formData.tags.filter(tag => tag !== tagToRemove));
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    handleInputChange('attachments', [...formData.attachments, ...files]);
-  };
-
-  const handleRemoveFile = (fileToRemove: File) => {
-    handleInputChange('attachments', formData.attachments.filter(file => file !== fileToRemove));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

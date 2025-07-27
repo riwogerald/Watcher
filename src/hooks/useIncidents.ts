@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Incident, User } from '../types';
+import { Incident } from '../types';
 
 const mockIncidents: Incident[] = [
   {

@@ -27,6 +27,12 @@ Watcher is a comprehensive incident reporting system designed to streamline comm
 - **🏷️ Advanced Filtering**: Search and filter by category, priority, status, and more
 - **📈 Analytics & Reporting**: Visual insights into incident patterns and resolution times
 - **👥 Role-Based Permissions**: Granular access control based on user roles
+- **🛡️ Error Boundaries**: Graceful error handling with user-friendly fallbacks
+- **🍞 Toast Notifications**: Beautiful, animated user feedback system
+- **♿ Accessibility**: WCAG compliant with keyboard navigation and screen reader support
+- **🧪 Testing**: Comprehensive test suite with Vitest and Testing Library
+- **⚡ Performance**: Code splitting, lazy loading, and React optimizations
+- **🔍 SEO Optimized**: Dynamic meta tags and social media previews
 
 ## 🚀 Getting Started
 
@@ -150,18 +156,54 @@ src/
 - **Performance metrics**: Resolution time analysis
 - **Status distribution**: Current incident state overview
 
+## 🧪 Testing
+
+The project includes a comprehensive test suite using Vitest and Testing Library:
+
+```bash
+# Run tests
+npm run test
+
+# Run tests in watch mode (for development)
+npm run test:watch
+
+# Run tests once
+npm run test:run
+
+# Run tests with UI interface
+npm run test:ui
+
+# Run tests with coverage report
+npm run test:coverage
+```
+
+### Test Structure
+- **Unit Tests**: Component testing with @testing-library/react
+- **Integration Tests**: Hook and context testing
+- **Accessibility Tests**: ARIA and keyboard navigation
+- **Mock Setup**: Configured for localStorage, media queries, and more
+
+## 🔧 Development Scripts
+
+```bash
+# Development
+npm run dev              # Start development server
+npm run build            # Build for production
+npm run preview          # Preview production build
+
+# Code Quality
+npm run lint             # Run ESLint
+npm run lint:fix         # Fix ESLint issues
+npm run type-check       # TypeScript type checking
+
+# Testing
+npm run test             # Run tests in watch mode
+npm run test:run         # Run tests once
+npm run test:ui          # Run tests with UI
+npm run test:coverage    # Run tests with coverage
+```
+
 ## 🚀 Deployment
-
-### Development Build
-```bash
-npm run dev
-```
-
-### Production Build
-```bash
-npm run build
-npm run preview
-```
 
 ### Docker Deployment
 ```dockerfile

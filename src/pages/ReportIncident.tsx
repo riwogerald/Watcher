@@ -7,8 +7,8 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useIncidents } from '../hooks/useIncidents';
-import { useAuth } from '../context/AuthContext';
-import { useNotifications } from '../context/NotificationContext';
+import { useAuth } from '../utils/authUtils';
+import { useNotifications } from '../utils/notificationUtils';
 
 interface FormData {
   title: string;
@@ -196,7 +196,7 @@ export function ReportIncident() {
                       name="category"
                       value={category.value}
                       checked={formData.category === category.value}
-                      onChange={(e) => handleInputChange('category', e.target.value as any)}
+                      onChange={(e) => handleInputChange('category', e.target.value as FormData['category'])}
                       className="sr-only"
                     />
                     <span className="text-2xl mr-3">{category.icon}</span>
@@ -268,7 +268,7 @@ export function ReportIncident() {
                       name="priority"
                       value={priority.value}
                       checked={formData.priority === priority.value}
-                      onChange={(e) => handleInputChange('priority', e.target.value as any)}
+                      onChange={(e) => handleInputChange('priority', e.target.value as FormData['priority'])}
                       className="mt-1 mr-3"
                     />
                     <div>

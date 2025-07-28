@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
+import { useAuth } from './utils/authUtils';
 import { NotificationProvider } from './context/NotificationContext';
 import { LoginForm } from './components/Auth/LoginForm';
 import { Layout } from './components/Layout/Layout';

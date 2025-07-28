@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { X, AlertTriangle, CheckCircle, UserPlus, Bell } from 'lucide-react';
 import { Notification } from '../../types';
-import { useNotifications } from '../../context/NotificationContext';
+import { useNotifications } from '../../utils/notificationUtils';
 import { formatDistanceToNow } from 'date-fns';
 
 interface NotificationDropdownProps {

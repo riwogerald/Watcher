@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { Notification } from '../types';
 
 interface NotificationContextType {
@@ -9,7 +9,7 @@ interface NotificationContextType {
   markAllAsRead: () => void;
 }
 
-const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
+export const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([
@@ -86,10 +86,3 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   );
 }
 
-export function useNotifications() {
-  const context = useContext(NotificationContext);
-  if (context === undefined) {
-    throw new Error('useNotifications must be used within a NotificationProvider');
-  }
-  return context;
-}

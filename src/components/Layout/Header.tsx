@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, User, LogOut, Settings, ChevronDown } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { useNotifications } from '../../context/NotificationContext';
+import { useAuth } from '../../utils/authUtils';
+import { useNotifications } from '../../utils/notificationUtils';
 import { NotificationDropdown } from '../Notifications/NotificationDropdown';
 import { formatDistanceToNow } from 'date-fns';
 

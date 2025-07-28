@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../utils/authUtils';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');

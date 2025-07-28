@@ -11,7 +11,7 @@ import {
   Shield,
   FileText
 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../utils/authUtils';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },

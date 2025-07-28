@@ -1,5 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { User } from '../types';
+import { getStorageItem, setStorageItem, removeStorageItem } from '../utils/storage';
+import { STORAGE_KEYS } from '../constants';
 
 interface AuthContextType {
   user: User | null;
@@ -47,9 +49,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Check for stored user session
-    const storedUser = localStorage.getItem('watcher_user');
+    const storedUser = getStorageItem<User>(STORAGE_KEYS.USER);
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      setUser(storedUser);
     }
     setIsLoading(false);
   }, []);
@@ -67,13 +69,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     
     setUser(user);
-    localStorage.setItem('watcher_user', JSON.stringify(user));
+    setStorageItem(STORAGE_KEYS.USER, user);
     setIsLoading(false);
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('watcher_user');
+    removeStorageItem(STORAGE_KEYS.USER);
   };
 
   return (

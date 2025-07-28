@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Incident } from '../types';
 
 const mockIncidents: Incident[] = [
@@ -143,43 +143,88 @@ const mockIncidents: Incident[] = [
 export function useIncidents() {
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setIncidents(mockIncidents);
-      setLoading(false);
-    }, 500);
+    let isMounted = true;
+    
+    const loadIncidents = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        if (isMounted) {
+          setIncidents(mockIncidents);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError('Failed to load incidents');
+          setLoading(false);
+        }
+      }
+    };
+
+    loadIncidents();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const createIncident = async (incidentData: Omit<Incident, 'id' | 'createdAt' | 'updatedAt' | 'comments'>) => {
-    const newIncident: Incident = {
-      ...incidentData,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      comments: []
-    };
-    
-    setIncidents(prev => [newIncident, ...prev]);
-    return newIncident;
-  };
+  const createIncident = useCallback(async (incidentData: Omit<Incident, 'id' | 'createdAt' | 'updatedAt' | 'comments'>) => {
+    try {
+      const newIncident: Incident = {
+        ...incidentData,
+        id: Date.now().toString(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        comments: []
+      };
+      
+      setIncidents(prev => [newIncident, ...prev]);
+      return newIncident;
+    } catch (err) {
+      setError('Failed to create incident');
+      throw err;
+    }
+  }, []);
 
-  const updateIncident = async (id: string, updates: Partial<Incident>) => {
-    setIncidents(prev => prev.map(incident => 
-      incident.id === id 
-        ? { ...incident, ...updates, updatedAt: new Date() }
-        : incident
-    ));
-  };
+  const updateIncident = useCallback(async (id: string, updates: Partial<Incident>) => {
+    try {
+      setIncidents(prev => prev.map(incident => 
+        incident.id === id 
+          ? { ...incident, ...updates, updatedAt: new Date() }
+          : incident
+      ));
+    } catch (err) {
+      setError('Failed to update incident');
+      throw err;
+    }
+  }, []);
 
-  const getIncidentById = (id: string) => {
+  const getIncidentById = useCallback((id: string) => {
     return incidents.find(incident => incident.id === id);
-  };
+  }, [incidents]);
+
+  // Memoized statistics
+  const statistics = useMemo(() => ({
+    total: incidents.length,
+    open: incidents.filter(i => i.status === 'open').length,
+    inProgress: incidents.filter(i => i.status === 'in_progress').length,
+    resolved: incidents.filter(i => i.status === 'resolved').length,
+    critical: incidents.filter(i => i.priority === 'critical').length,
+    high: incidents.filter(i => i.priority === 'high').length,
+  }), [incidents]);
 
   return {
     incidents,
     loading,
+    error,
+    statistics,
     createIncident,
     updateIncident,
     getIncidentById

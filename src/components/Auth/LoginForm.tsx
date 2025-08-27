@@ -87,7 +87,9 @@ export function LoginForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-pressed={showPassword}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -96,11 +98,14 @@ export function LoginForm() {
 
             {error && (
               <motion.div
+                id="login-error"
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="flex items-center space-x-2 text-red-600 text-sm"
+                role="alert"
+                aria-live="polite"
               >
-                <AlertCircle className="w-4 h-4" />
+                <AlertCircle className="w-4 h-4" aria-hidden="true" />
                 <span>{error}</span>
               </motion.div>
             )}
@@ -111,8 +116,16 @@ export function LoginForm() {
               type="submit"
               disabled={isLoading}
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              aria-describedby={error ? 'login-error' : undefined}
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? (
+                <>
+                  <span className="sr-only">Signing in, please wait</span>
+                  Signing in...
+                </>
+              ) : (
+                'Sign In'
+              )}
             </motion.button>
           </form>
         </motion.div>
@@ -127,18 +140,19 @@ export function LoginForm() {
           <h3 className="text-white font-medium mb-4">Demo Credentials</h3>
           <div className="space-y-3">
             {demoCredentials.map((cred, index) => (
-              <motion.div
+              <motion.button
                 key={index}
                 whileHover={{ scale: 1.02 }}
                 onClick={() => {
                   setEmail(cred.email);
                   setPassword(cred.password);
                 }}
-                className="bg-slate-700 rounded-lg p-3 cursor-pointer hover:bg-slate-600 transition-colors"
+                className="w-full bg-slate-700 rounded-lg p-3 cursor-pointer hover:bg-slate-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-800 text-left"
+                aria-label={`Fill form with ${cred.role} credentials`}
               >
                 <div className="text-sm text-white font-medium">{cred.role}</div>
                 <div className="text-xs text-slate-300">{cred.email}</div>
-              </motion.div>
+              </motion.button>
             ))}
           </div>
         </motion.div>

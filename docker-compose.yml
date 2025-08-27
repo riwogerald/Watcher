@@ -1,0 +1,158 @@
+version: '3.8'
+
+services:
+  # Watcher Frontend Application
+  watcher-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: watcher-frontend
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:3001/api}
+      - VITE_WS_URL=${VITE_WS_URL:-ws://localhost:3001}
+      - VITE_APP_NAME=${VITE_APP_NAME:-Watcher}
+    volumes:
+      # Mount logs for debugging (optional)
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - watcher-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.watcher.rule=Host(`watcher.local`)"
+      - "traefik.http.services.watcher.loadbalancer.server.port=3000"
+
+  # Mock API Server (for development)
+  mock-api:
+    image: node:18-alpine
+    container_name: watcher-mock-api
+    working_dir: /app
+    ports:
+      - "${API_PORT:-3001}:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+    volumes:
+      - ./mock-api:/app
+      - /app/node_modules
+    command: >
+      sh -c "
+        if [ ! -f package.json ]; then
+          npm init -y
+          npm install express cors helmet morgan
+        fi
+        node server.js
+      "
+    restart: unless-stopped
+    networks:
+      - watcher-network
+    depends_on:
+      - redis
+
+  # Redis for caching and session storage
+  redis:
+    image: redis:7-alpine
+    container_name: watcher-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server /usr/local/etc/redis/redis.conf
+    restart: unless-stopped
+    networks:
+      - watcher-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Reverse Proxy (Traefik)
+  traefik:
+    image: traefik:v3.0
+    container_name: watcher-traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=admin@watcher.local"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080" # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik-letsencrypt:/letsencrypt
+    restart: unless-stopped
+    networks:
+      - watcher-network
+    profiles:
+      - production
+
+  # Monitoring with Prometheus (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: watcher-prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - watcher-network
+    profiles:
+      - monitoring
+
+  # Grafana for metrics visualization (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: watcher-grafana
+    ports:
+      - "${GRAFANA_PORT:-3030}:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    restart: unless-stopped
+    networks:
+      - watcher-network
+    profiles:
+      - monitoring
+    depends_on:
+      - prometheus
+
+volumes:
+  redis-data:
+    driver: local
+  traefik-letsencrypt:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+networks:
+  watcher-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

@@ -1,15 +1,51 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle, CheckCircle, Clock, TrendingUp } from 'lucide-react';
-import { useDashboard } from '../hooks/useDashboard';
-import { useIncidents } from '../hooks/useIncidents';
+import { useDashboard, useIncidents } from '../hooks/queries';
 import { StatsCard } from '../components/Dashboard/StatsCard';
 import { IncidentChart } from '../components/Dashboard/IncidentChart';
 import { RecentIncidents } from '../components/Dashboard/RecentIncidents';
+import { DashboardSEO } from '../components/SEO/SEOHead';
 
-export function Dashboard() {
-  const { dashboard, loading: dashboardLoading } = useDashboard();
-  const { incidents, loading: incidentsLoading } = useIncidents();
+export const Dashboard = React.memo(() => {
+  const { data: dashboard, isLoading: dashboardLoading, error: dashboardError } = useDashboard();
+  const { data: incidents, isLoading: incidentsLoading, error: incidentsError } = useIncidents();
+
+  // Memoize expensive computations
+  const statsCards = useMemo(() => {
+    if (!dashboard) return [];
+    
+    return [
+      {
+        title: "Total Incidents",
+        value: dashboard.totalIncidents,
+        change: { value: 12, type: 'increase' as const },
+        icon: AlertTriangle,
+        color: "blue" as const
+      },
+      {
+        title: "Open Incidents",
+        value: dashboard.openIncidents,
+        change: { value: 8, type: 'decrease' as const },
+        icon: Clock,
+        color: "orange" as const
+      },
+      {
+        title: "Resolved Today",
+        value: dashboard.resolvedToday,
+        change: { value: 15, type: 'increase' as const },
+        icon: CheckCircle,
+        color: "green" as const
+      },
+      {
+        title: "Avg Resolution Time",
+        value: `${dashboard.avgResolutionTime}h`,
+        change: { value: 5, type: 'decrease' as const },
+        icon: TrendingUp,
+        color: "red" as const
+      }
+    ];
+  }, [dashboard]);
 
   if (dashboardLoading || incidentsLoading) {
     return (
@@ -33,7 +69,9 @@ export function Dashboard() {
   if (!dashboard) return null;
 
   return (
-    <div className="p-6 space-y-6">
+    <>
+      <DashboardSEO />
+      <div className="p-6 space-y-6">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -44,34 +82,16 @@ export function Dashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatsCard
-          title="Total Incidents"
-          value={dashboard.totalIncidents}
-          change={{ value: 12, type: 'increase' }}
-          icon={AlertTriangle}
-          color="blue"
-        />
-        <StatsCard
-          title="Open Incidents"
-          value={dashboard.openIncidents}
-          change={{ value: 8, type: 'decrease' }}
-          icon={Clock}
-          color="orange"
-        />
-        <StatsCard
-          title="Resolved Today"
-          value={dashboard.resolvedToday}
-          change={{ value: 15, type: 'increase' }}
-          icon={CheckCircle}
-          color="green"
-        />
-        <StatsCard
-          title="Avg Resolution Time"
-          value={`${dashboard.avgResolutionTime}h`}
-          change={{ value: 5, type: 'decrease' }}
-          icon={TrendingUp}
-          color="red"
-        />
+        {statsCards.map((card, index) => (
+          <StatsCard
+            key={card.title}
+            title={card.title}
+            value={card.value}
+            change={card.change}
+            icon={card.icon}
+            color={card.color}
+          />
+        ))}
       </div>
 
       {/* Charts and Recent Incidents */}
@@ -131,5 +151,6 @@ export function Dashboard() {
         </div>
       </div>
     </div>
+    </>
   );
-}
+});

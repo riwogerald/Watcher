@@ -16,6 +16,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.85.5",
+    "@tanstack/react-query-devtools": "^5.85.5",
     "date-fns": "^2.30.0",
     "framer-motion": "^10.16.16",
     "lucide-react": "^0.344.0",

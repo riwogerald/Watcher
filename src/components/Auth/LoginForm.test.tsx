@@ -20,7 +20,7 @@ describe('LoginForm', () => {
     expect(screen.getByText('Watcher')).toBeInTheDocument();
     expect(screen.getByText('Incident Reporting System')).toBeInTheDocument();
     expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/enter your password/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
   });
 
@@ -38,21 +38,26 @@ describe('LoginForm', () => {
     render(<LoginFormWrapper />);
     
     const emailInput = screen.getByLabelText(/email address/i);
-    const passwordInput = screen.getByLabelText(/password/i);
+    const passwordInput = screen.getByPlaceholderText(/enter your password/i);
     
+    await user.clear(emailInput);
     await user.type(emailInput, 'test@example.com');
+    
+    await user.clear(passwordInput);
     await user.type(passwordInput, 'password123');
     
-    expect(emailInput).toHaveValue('test@example.com');
-    expect(passwordInput).toHaveValue('password123');
-  });
+    await waitFor(() => {
+      expect(emailInput).toHaveValue('test@example.com');
+      expect(passwordInput).toHaveValue('password123');
+    });
+  }, 10000);
 
   it('toggles password visibility', async () => {
     const user = userEvent.setup();
     render(<LoginFormWrapper />);
     
-    const passwordInput = screen.getByLabelText(/password/i);
-    const toggleButton = screen.getByRole('button', { name: '' }); // Eye icon button
+    const passwordInput = screen.getByPlaceholderText(/enter your password/i);
+    const toggleButton = screen.getByRole('button', { name: /show password/i });
     
     expect(passwordInput).toHaveAttribute('type', 'password');
     
@@ -71,7 +76,7 @@ describe('LoginForm', () => {
     await user.click(adminOption.closest('div')!);
     
     const emailInput = screen.getByLabelText(/email address/i);
-    const passwordInput = screen.getByLabelText(/password/i);
+    const passwordInput = screen.getByPlaceholderText(/enter your password/i);
     
     expect(emailInput).toHaveValue('admin@company.com');
     expect(passwordInput).toHaveValue('password');

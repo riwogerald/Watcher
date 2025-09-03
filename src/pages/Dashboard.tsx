@@ -5,6 +5,7 @@ import { useDashboard, useIncidents } from '../hooks/queries';
 import { StatsCard } from '../components/Dashboard/StatsCard';
 import { IncidentChart } from '../components/Dashboard/IncidentChart';
 import { RecentIncidents } from '../components/Dashboard/RecentIncidents';
+import { LiveStatusTracker } from '../components/LiveStatusTracker/LiveStatusTracker';
 import { DashboardSEO } from '../components/SEO/SEOHead';
 
 export const Dashboard = React.memo(() => {
@@ -97,8 +98,11 @@ export const Dashboard = React.memo(() => {
       {/* Charts and Recent Incidents */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <IncidentChart data={dashboard.trend} />
-        <RecentIncidents incidents={incidents} />
+        <RecentIncidents incidents={incidents || []} />
       </div>
+
+      {/* Live Status Tracker */}
+      <LiveStatusTracker />
 
       {/* Category and Priority Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
